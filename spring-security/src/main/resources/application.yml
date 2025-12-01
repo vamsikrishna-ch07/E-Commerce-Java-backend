@@ -1,0 +1,30 @@
+#server:
+#  port: 8088
+#
+#spring:
+#  application:
+#    name: spring-security
+#  cloud:
+#    config:
+#      enabled: false
+#
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka
+#
+#jwt:
+#  secret: 41Dk432F44F4528482B4D6251655468576D5A7134743777217A25432A462D4A6
+#  expirationMs: 86400000
+
+
+spring:
+  application:
+    name: spring-security
+
+  config:
+    import: optional:configserver:http://localhost:8888
+
+
+
+

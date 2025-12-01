@@ -8,31 +8,42 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
+        <module name="cart-service" />
+        <module name="inventory-service" />
+        <module name="payment-service" />
         <module name="gateway-service" />
+        <module name="product-service" />
+        <module name="order-service" />
+        <module name="user-service" />
+        <module name="wishlist-service" />
         <module name="service-registry" />
+        <module name="notification-service" />
       </profile>
       <profile name="Annotation profile for E-Commerce Microservices" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
         </processorPath>
         <module name="spring-security" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="auth-service" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="auth-service" options="-parameters" />
+      <module name="cart-service" options="-parameters" />
       <module name="config-server" options="-parameters" />
       <module name="gateway-service" options="-parameters" />
+      <module name="inventory-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
+      <module name="order-service" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
+      <module name="product-service" options="-parameters" />
       <module name="service-registry" options="-parameters" />
       <module name="spring-security" options="-parameters" />
+      <module name="user-service" options="-parameters" />
+      <module name="wishlist-service" options="-parameters" />
     </option>
   </component>
 </project>
