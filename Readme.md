@@ -76,3 +76,5 @@ Store order data
 
 Tables: order(id, user_id, order_date, total_amount)
 order_items(order_id, product_id, quantity, price)
+
+
