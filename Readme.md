@@ -76,3 +76,189 @@ Store order data
 
 Tables: order(id, user_id, order_date, total_amount)
 order_items(order_id, product_id, quantity, price)
+
+
+============git commands====================
+📘 Git Workflow – Real-Time Project Guide
+
+This document explains all Git commands used in real company workflow, starting from git init to branch creation, pulling, merging, resolving conflicts, PR process, and deployment flow.
+
+🏁 1. Initialize Git (Only Once Per Project)
+git init
+git add .
+git commit -m "Initial commit"
+
+🌐 2. Connect Local Project to GitHub
+git remote add origin <REMOTE_GITHUB_URL>
+git branch -M main
+git push -u origin main
+
+👥 3. Clone Existing Project (If Repository Already Exists)
+
+(Most developers start from here)
+
+git clone <REMOTE_GITHUB_URL>
+cd project-folder
+
+🌿 4. Create Your Feature Branch (Real-Time Workflow)
+git checkout -b feature/<your-feature-name>
+
+
+Example:
+
+git checkout -b feature/user-module
+
+🛠 5. Make Changes and Commit
+git add .
+git commit -m "Added user service implementation"
+
+🔄 6. Always Keep Your Branch Updated (Daily Workflow)
+
+Before you push, you must update your branch with the latest main.
+
+➤ Step 1: Go to main
+git checkout main
+
+➤ Step 2: Pull latest code from main
+git pull origin main
+
+➤ Step 3: Go back to your branch
+git checkout feature/user-module
+
+➤ Step 4: Merge main into your branch
+git merge main
+
+
+→ If conflicts occur, resolve them
+→ After resolving:
+
+git add .
+git commit
+
+🚀 7. Push Your Updated Branch
+git push origin feature/user-module
+
+🔁 8. Create Pull Request (PR) – Real-Time Process
+
+Go to GitHub
+
+Open your branch
+
+Click “Compare & Pull Request”
+
+Add proper title & description
+
+Team lead reviews
+
+PR gets approved or requested for changes
+
+After approval → Merge PR to main
+
+🧹 9. Delete Branch After Merge (Recommended)
+git branch -d feature/user-module       # local delete
+git push origin --delete feature/user-module  # remote delete
+
+🧩 10. Fix Merge Conflicts (If Occurs)
+
+When you merge main into your feature branch:
+
+git merge main
+
+
+If conflict occurs:
+
+Open the file
+
+You will see:
+
+<<<<<<< HEAD
+your code
+=======
+their code
+>>>>>>> main
+
+
+Choose final code
+
+Remove conflict markers
+
+Stage file:
+
+git add <file>
+
+
+Commit:
+
+git commit
+
+🔄 11. Rebase Instead of Merge (Optional)
+
+(Advanced developers use this)
+
+git checkout feature/user-module
+git pull --rebase origin main
+
+📦 12. Stashing Changes (When switching branches)
+git stash
+git checkout main
+git pull
+git checkout feature/user-module
+git stash pop
+
+🧭 13. Check Status, Log, and Branches
+git status
+git log
+git branch
+git branch -a
+
+🧨 14. Undo Mistakes (Important Real-Time Commands)
+Undo last commit (keep code):
+git reset --soft HEAD~1
+
+Undo last commit (delete code):
+git reset --hard HEAD~1
+
+Discard local changes:
+git restore .
+
+🏷 15. Tagging Releases (Deployment Pipeline)
+git tag -a v1.0 -m "First release"
+git push origin v1.0
+
+🔚 END-TO-END WORKFLOW SUMMARY (MOST IMPORTANT)
+git clone repo
+git checkout -b feature/<name>
+write code
+git add .
+git commit -m "message"
+
+git checkout main
+git pull origin main
+git checkout feature/<name>
+git merge main     (resolve conflicts if any)
+
+git push origin feature/<name>
+Create Pull Request on GitHub
+Get approval → merge to main
+Delete branch
+
+
+
+🔚 END-TO-END WORKFLOW SUMMARY (MOST IMPORTANT)
+
+
+git clone repo
+git checkout -b feature/<name>
+write code
+git add .
+git commit -m "message"
+
+git checkout main
+git pull origin main
+git checkout feature/<name>
+git merge main     (resolve conflicts if any)
+
+git push origin feature/<name>
+Create Pull Request on GitHub
+Get approval → merge to main
+Delete branch
