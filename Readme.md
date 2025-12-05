@@ -262,3 +262,22 @@ git push origin feature/<name>
 Create Pull Request on GitHub
 Get approval → merge to main
 Delete branch
+
+
+
+
+
+
+
+======
+.
+Replace Placeholders: Open the docker-compose.yml file and replace YOUR_DB_USERNAME and YOUR_DB_PASSWORD with your desired credentials.
+2.
+Build the JARs: Before running Docker Compose, you must build your Spring Boot projects to create the .jar files. Run this command from the root of your project:
+Shell Script
+mvn clean install
+3.
+Run Docker Compose: Once the build is complete, start your entire application stack with a single command from the project root:
+Shell Script
+docker-compose up --build
+Your entire e-commerce application will now be running, with each service in its own container. You can open Docker Desktop to see all the individual containers and images.
