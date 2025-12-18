@@ -14,4 +14,5 @@ import java.math.BigDecimal;
 public class PaymentRequest {
     private Long orderId;
     private BigDecimal amount;
+    private String paymentMethod; // e.g., "CREDIT_CARD", "PAYPAL"
 }

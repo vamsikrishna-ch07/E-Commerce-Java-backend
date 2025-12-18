@@ -17,8 +17,12 @@ import java.math.BigDecimal;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id") // Explicitly map this field to the 'id' column
+    private Long productId;
     private String name;
     private String description;
+    private String brand;
+    private String category;
     private BigDecimal price;
+    private String imageUrl;
 }

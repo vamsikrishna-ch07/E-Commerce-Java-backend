@@ -1,4 +1,3 @@
-
 networks:
   ecommerce-network:
     driver: bridge
@@ -47,12 +46,9 @@ services:
       - "8761:8761"
     depends_on:
       config-server:
-        condition: service_healthy
+        condition: service_healthy # Wait for config-server to be healthy
     environment:
       - SERVER_PORT=8761
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
-      - EUREKA_CLIENT_FETCH_REGISTRY=false
     networks:
       - ecommerce-network
     healthcheck:
@@ -61,190 +57,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # API Gateway
-  gateway-service:
-    build: ./gateway-service
-    container_name: gateway-service
-    ports:
-      - "8080:8080"
-    depends_on:
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # Product Service
-  product-service:
-    build: ./product-service
-    container_name: product-service
-    ports:
-      - "8081:8081"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SERVER_PORT=8081
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/product_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # Order Service
-  order-service:
-    build: ./order-service
-    container_name: order-service
-    ports:
-      - "8082:8082"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SERVER_PORT=8082
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/order_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # Inventory Service
-  inventory-service:
-    build: ./inventory-service
-    container_name: inventory-service
-    ports:
-      - "8083:8083"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SERVER_PORT=8083
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/inventory_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # Payment Service
-  payment-service:
-    build: ./payment-service
-    container_name: payment-service
-    ports:
-      - "8084:8084"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SERVER_PORT=8084
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/payment_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # Cart Service
-  cart-service:
-    build: ./cart-service
-    container_name: cart-service
-    ports:
-      - "8085:8085"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SERVER_PORT=8085
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/cart_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # User Service
-  user-service:
-    build: ./user-service
-    container_name: user-service
-    ports:
-      - "8086:8086"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SERVER_PORT=8086
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/user_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # Wishlist Service
-  wishlist-service:
-    build: ./wishlist-service
-    container_name: wishlist-service
-    ports:
-      - "8087:8087"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SERVER_PORT=8087
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/wishlist_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # Notification Service
-  notification-service:
-    build: ./notification-service
-    container_name: notification-service
-    ports:
-      - "8088:8088"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-    environment:
-      - SERVER_PORT=8088
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/notification_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
-    networks:
-      - ecommerce-network
-
-  # Spring Security Service
+  # Auth Service (Spring Security)
   spring-security:
     build: ./spring-security
     container_name: spring-security
@@ -255,15 +68,233 @@ services:
         condition: service_healthy
       service-registry:
         condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
     environment:
       - SERVER_PORT=8089
-      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/security_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=Kr12@984872
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Gateway
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      spring-security:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8080
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # All other services
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+      spring-security:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8081
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+      spring-security:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8082
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+      spring-security:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8083
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+      spring-security:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8084
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cart-service:
+    build: ./cart-service
+    container_name: cart-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+      spring-security:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8085
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+      spring-security:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8086
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wishlist-service:
+    build: ./wishlist-service
+    container_name: wishlist-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+      spring-security:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8087
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8087/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "8088:8088"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy # Wait for config-server to be healthy
+      service-registry:
+        condition: service_healthy
+      spring-security:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8088
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mysql_data:

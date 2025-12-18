@@ -12,9 +12,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class ProductResponse {
-    private Long id;
+    private Long productId; // Renamed from 'id'
     private String name;
     private String description;
+    private String brand;    // Added
+    private String category; // Added
     private BigDecimal price;
-    private Integer quantity;
+    private String imageUrl; // Added
+    // Removed 'quantity' as it will be fetched separately for product details
 }

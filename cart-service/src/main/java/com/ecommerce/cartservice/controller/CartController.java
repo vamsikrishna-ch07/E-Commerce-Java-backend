@@ -1,9 +1,16 @@
 package com.ecommerce.cartservice.controller;
+
 import com.ecommerce.cartservice.dto.AddToCartRequest;
 import com.ecommerce.cartservice.dto.CartResponse;
+import com.ecommerce.cartservice.dto.UpdateCartItemRequest;
 import com.ecommerce.cartservice.service.CartService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/cart")
@@ -12,13 +19,52 @@ public class CartController {
 
     private final CartService cartService;
 
-    @PostMapping("/add")
-    public CartResponse addToCart(@RequestBody AddToCartRequest request) {
-        return cartService.addToCart(request);
+    private Long getUserId(Principal principal) {
+        return Long.valueOf(principal.getName());
     }
 
-    @GetMapping("/{userId}")
-    public CartResponse getCart(@PathVariable Long userId) {
-        return cartService.getCart(userId);
+    @GetMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<CartResponse> getCart(Principal principal) {
+        Long userId = getUserId(principal);
+        CartResponse cart = cartService.getCart(userId);
+        return ResponseEntity.ok(cart);
+    }
+
+    @PostMapping("/add")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<CartResponse> addToCart(Principal principal, @RequestBody AddToCartRequest request) {
+        request.setUserId(getUserId(principal));
+        CartResponse cart = cartService.addToCart(request);
+        return new ResponseEntity<>(cart, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update/{productId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<CartResponse> updateCartItem(
+            Principal principal,
+            @PathVariable Long productId,
+            @RequestBody UpdateCartItemRequest request) {
+        Long userId = getUserId(principal);
+        CartResponse cart = cartService.updateCartItem(userId, productId, request);
+        return ResponseEntity.ok(cart);
+    }
+
+    @DeleteMapping("/remove/{productId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> removeCartItem(Principal principal, @PathVariable Long productId) {
+        Long userId = getUserId(principal);
+        cartService.removeCartItem(userId, productId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+    @DeleteMapping("/clear")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> clearCart(Principal principal) {
+        Long userId = getUserId(principal);
+        cartService.clearCart(userId);
+        return ResponseEntity.noContent().build();
     }
 }

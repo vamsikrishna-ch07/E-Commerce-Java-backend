@@ -1,4 +1,4 @@
-package com.ecommerce.securityservice.dto;
+package com.ecommerce.notificationservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthResponse {
-    private String token;
+public class NotificationResponse {
+    private String status;
+    private String message;
+    private String recipient;
 }

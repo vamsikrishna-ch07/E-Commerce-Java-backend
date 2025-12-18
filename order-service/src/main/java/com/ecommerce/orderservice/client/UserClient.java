@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "user-service")
 public interface UserClient {
 
-    @GetMapping("/api/v1/users/{id}")
-    UserResponse getUserById(@PathVariable("id") Long id);
+    @GetMapping("/api/v1/users/internal/id/{userId}") // Corrected to call the new internal endpoint by ID
+    UserResponse getUserById(@PathVariable("userId") Long userId);
 }

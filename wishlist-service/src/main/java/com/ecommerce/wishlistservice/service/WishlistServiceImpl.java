@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,15 +44,17 @@ public class WishlistServiceImpl implements WishlistService {
             wishlist = wishlistRepository.save(wishlist);
         }
 
-        // Reuse the mapping logic directly to avoid another database call
         return mapToWishlistResponse(wishlist);
     }
 
     @Override
     public WishlistResponse getWishlistByUserId(Long userId) {
         return wishlistRepository.findByUserId(userId)
-                .map(this::mapToWishlistResponse) // Use Optional.map for a fluent, stream-like chain
-                .orElseThrow(() -> new RuntimeException("Wishlist not found for user: " + userId));
+                .map(this::mapToWishlistResponse)
+                .orElseGet(() -> WishlistResponse.builder() // Return an empty wishlist if not found
+                        .userId(userId)
+                        .items(new ArrayList<>())
+                        .build());
     }
 
     @Override
@@ -60,7 +63,10 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishlistRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Wishlist not found for user: " + userId));
 
-        wishlist.getItems().removeIf(item -> item.getProductId().equals(productId));
+        boolean removed = wishlist.getItems().removeIf(item -> item.getProductId().equals(productId));
+        if (!removed) {
+            throw new RuntimeException("Product with ID " + productId + " not found in wishlist.");
+        }
         wishlistRepository.save(wishlist);
     }
 
@@ -74,7 +80,7 @@ public class WishlistServiceImpl implements WishlistService {
                 .collect(Collectors.toList());
 
         return WishlistResponse.builder()
-                .wishlistId(wishlist.getId())
+                .id(wishlist.getId()) // Corrected field name
                 .userId(wishlist.getUserId())
                 .items(itemResponses)
                 .build();
@@ -88,16 +94,18 @@ public class WishlistServiceImpl implements WishlistService {
         try {
             ProductResponse product = productClient.getProductById(item.getProductId());
             return WishlistItemResponse.builder()
-                    .productId(product.getId())
+                    .productId(product.getProductId()) // Use productId
                     .productName(product.getName())
-                    .description(product.getDescription())
+                    .brand(product.getBrand())
+                    .category(product.getCategory())
                     .price(product.getPrice())
+                    .imageUrl(product.getImageUrl())
                     .build();
         } catch (Exception e) {
             // Handle case where product service is down or product not found
             return WishlistItemResponse.builder()
                     .productId(item.getProductId())
-                    .productName("Product not found")
+                    .productName("Product not found or service unavailable")
                     .build();
         }
     }

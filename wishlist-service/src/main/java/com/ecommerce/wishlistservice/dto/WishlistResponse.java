@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class WishlistResponse {
-    private Long wishlistId;
+    private Long id; // Changed from wishlistId to id for consistency with entity
     private Long userId;
     private List<WishlistItemResponse> items;
 }

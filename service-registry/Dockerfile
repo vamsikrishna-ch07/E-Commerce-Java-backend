@@ -1,14 +1,6 @@
-# Use a robust and widely-used OpenJDK 17 image
 FROM eclipse-temurin:17-jdk-focal
-
-# Set the working directory in the container
 WORKDIR /app
-
-# Copy the compiled Spring Boot jar file into the container
 COPY target/*.jar app.jar
-
-# Expose the port defined in docker-compose.yml (8761)
-EXPOSE 8761
-
-# Command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY wait-for-it.sh .
+RUN chmod +x wait-for-it.sh
+ENTRYPOINT ["./wait-for-it.sh", "config-server", "8888", "java", "-jar", "app.jar"]

@@ -1,4 +1,4 @@
-package com.ecommerce.securityservice.dto;
+package com.ecommerce.userservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthRequest {
+public class UserProfileUpdateRequest {
     private String username;
-    private String password;
+    private String email;
+    // Add other profile fields that can be updated
 }

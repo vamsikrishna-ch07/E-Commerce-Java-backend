@@ -5,7 +5,8 @@ FROM eclipse-temurin:17-jdk-focal
 WORKDIR /app
 
 # Copy the compiled Spring Boot jar file into the container
-COPY target/*.jar app.jar
+# Explicitly copy the generated JAR file name
+COPY target/spring-security-1.0.jar app.jar
 
 # Expose the port defined in docker-compose.yml (SERVER_PORT=8089)
 EXPOSE 8089

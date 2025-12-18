@@ -6,7 +6,10 @@ import com.ecommerce.wishlistservice.service.WishlistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/wishlist")
@@ -15,19 +18,33 @@ public class WishlistController {
 
     private final WishlistService wishlistService;
 
-    @PostMapping("/add")
-    public ResponseEntity<WishlistResponse> addItemToWishlist(@RequestBody AddToWishlistRequest request) {
-        return new ResponseEntity<>(wishlistService.addItemToWishlist(request), HttpStatus.CREATED);
+    private Long getUserId(Principal principal) {
+        return Long.valueOf(principal.getName());
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<WishlistResponse> getWishlistByUserId(@PathVariable Long userId) {
+    @GetMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<WishlistResponse> getWishlist(Principal principal) {
+        Long userId = getUserId(principal);
         return ResponseEntity.ok(wishlistService.getWishlistByUserId(userId));
     }
 
-    @DeleteMapping("/{userId}/items/{productId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeItemFromWishlist(@PathVariable Long userId, @PathVariable Long productId) {
+    @PostMapping("/{productId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<WishlistResponse> addItemToWishlist(Principal principal, @PathVariable Long productId) {
+        Long userId = getUserId(principal);
+        AddToWishlistRequest request = AddToWishlistRequest.builder()
+                .userId(userId)
+                .productId(productId)
+                .build();
+        return new ResponseEntity<>(wishlistService.addItemToWishlist(request), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{productId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> removeItemFromWishlist(Principal principal, @PathVariable Long productId) {
+        Long userId = getUserId(principal);
         wishlistService.removeItemFromWishlist(userId, productId);
+        return ResponseEntity.noContent().build();
     }
 }

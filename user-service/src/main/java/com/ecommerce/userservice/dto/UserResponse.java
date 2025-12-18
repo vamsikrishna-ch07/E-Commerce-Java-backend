@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +15,7 @@ public class UserResponse {
     private Long id;
     private String username;
     private String email;
-    private String password; // Added for authentication purposes
+    private String password; // Re-enabled for internal use by security service
     private String role;
+    private List<AddressResponse> addresses;
 }

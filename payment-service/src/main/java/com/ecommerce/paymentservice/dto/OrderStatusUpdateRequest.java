@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class OrderStatusUpdateRequest {
-    private String status;
+    private String status; // Changed from OrderStatus to String
 }

@@ -1,0 +1,23 @@
+### Maven
+.mvn/wrapper/maven-wrapper.jar
+
+### IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+### OS
+.DS_Store
+.git/
+.gitignore
+.project
+.settings/
+.classpath
+
+tmp/
+.apt_generated/
+.factorypath/
+.springBeans/
+.sts4-cache/
