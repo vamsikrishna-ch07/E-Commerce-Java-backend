@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class OrderRequest {
-    private Long userId; // Will be set by controller from authenticated user
+    private Long userId;
     private String shippingAddress;
     // Potentially a list of items if not checking out from cart, but for now, assume from cart
 }

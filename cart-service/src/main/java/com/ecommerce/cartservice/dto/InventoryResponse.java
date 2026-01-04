@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class InventoryResponse {
     private Long productId;
     private Integer quantity;
+    private Boolean inStock;
 }

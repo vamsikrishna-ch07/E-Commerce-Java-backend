@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "cart-service")
 public interface CartClient {
 
-    @GetMapping("/api/v1/cart") // Corrected: No userId needed in path
-    CartResponse getCart();
+    @GetMapping("/api/v1/cart/internal/{userId}")
+    CartResponse getCartByUserId(@PathVariable("userId") Long userId);
 
-    @DeleteMapping("/api/v1/cart/clear") // Corrected: No userId needed in path
-    void clearCart();
+    @DeleteMapping("/api/v1/cart/internal/{userId}/clear")
+    void clearCart(@PathVariable("userId") Long userId);
 }

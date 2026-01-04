@@ -31,6 +31,14 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
+    // New endpoint for internal service-to-service communication
+    @GetMapping("/internal/{userId}")
+    @PreAuthorize("hasAuthority('SCOPE_internal.read')")
+    public ResponseEntity<CartResponse> getCartByUserId(@PathVariable("userId") Long userId) {
+        CartResponse cart = cartService.getCart(userId);
+        return ResponseEntity.ok(cart);
+    }
+
     @PostMapping("/add")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CartResponse> addToCart(Principal principal, @RequestBody AddToCartRequest request) {
@@ -58,12 +66,18 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-
-
     @DeleteMapping("/clear")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> clearCart(Principal principal) {
         Long userId = getUserId(principal);
+        cartService.clearCart(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // New endpoint for internal service-to-service communication
+    @DeleteMapping("/internal/{userId}/clear")
+    @PreAuthorize("hasAuthority('SCOPE_internal.write')")
+    public ResponseEntity<Void> clearCartByUserId(@PathVariable("userId") Long userId) {
         cartService.clearCart(userId);
         return ResponseEntity.noContent().build();
     }

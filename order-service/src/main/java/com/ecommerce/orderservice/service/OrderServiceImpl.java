@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
         UserResponse user = userClient.getUserById(userId); // First declaration and assignment
 
         // 2. Get Cart Details
-        CartResponse cart = cartClient.getCart();
+        CartResponse cart = cartClient.getCartByUserId(userId);
         if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty or not found for user: " + userId);
         }
@@ -107,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 6. Clear the user's cart
-        cartClient.clearCart();
+        cartClient.clearCart(userId);
 
         // 7. Send Order Confirmation Notification
         // Reusing the 'user' variable declared at the beginning of the method

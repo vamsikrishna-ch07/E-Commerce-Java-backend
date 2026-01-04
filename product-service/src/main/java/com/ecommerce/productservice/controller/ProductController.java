@@ -21,7 +21,7 @@ public class ProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')") // Changed from hasAuthority('SCOPE_products.write')
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductResponse createProduct(@RequestBody ProductRequest productRequest) {
         return productService.createProduct(productRequest);
     }
@@ -29,6 +29,14 @@ public class ProductController {
     @GetMapping("/{productId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable("productId") Long productId) {
+        ProductResponse product = productService.getProductById(productId);
+        return ResponseEntity.ok(product);
+    }
+
+    // New endpoint for internal service-to-service communication
+    @GetMapping("/internal/{productId}")
+    @PreAuthorize("hasAuthority('SCOPE_internal.read')")
+    public ResponseEntity<ProductResponse> getProductByIdInternal(@PathVariable("productId") Long productId) {
         ProductResponse product = productService.getProductById(productId);
         return ResponseEntity.ok(product);
     }
@@ -42,7 +50,7 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    @PreAuthorize("hasRole('ADMIN')") // Changed from hasAuthority('SCOPE_products.write')
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable("productId") Long productId, @RequestBody ProductRequest productRequest) {
         ProductResponse updatedProduct = productService.updateProduct(productId, productRequest);
         return ResponseEntity.ok(updatedProduct);
@@ -50,7 +58,7 @@ public class ProductController {
 
     @DeleteMapping("/{productId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')") // Changed from hasAuthority('SCOPE_products.write')
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(@PathVariable("productId") Long productId) {
         productService.deleteProduct(productId);
     }

@@ -37,9 +37,24 @@ public class CartServiceImpl implements CartService {
         }
 
         // STEP 2: Validate Stock from Inventory Service
-        InventoryResponse inventory = inventoryClient.getInventoryByProductId(request.getProductId());
-        if (inventory == null || inventory.getQuantity() < request.getQuantity()) {
-            throw new RuntimeException("Product is out of stock or insufficient quantity!");
+        InventoryResponse inventory = null;
+        try {
+            inventory = inventoryClient.getInventoryByProductId(request.getProductId());
+        } catch (Exception e) {
+            // If inventory service returns 404 or fails, assume 0 stock
+            System.err.println("Failed to fetch inventory for product " + request.getProductId() + ": " + e.getMessage());
+        }
+
+        // If inventory is null (404 from service) or quantity is insufficient
+        // NOTE: For internal logic, we might need the exact quantity.
+        // If the inventory response only gives 'inStock' boolean for users,
+        // we need to ensure the internal call (from Cart Service) gets the quantity.
+        // The Inventory Controller logic now supports returning quantity for internal calls.
+        
+        int availableQuantity = (inventory != null && inventory.getQuantity() != null) ? inventory.getQuantity() : 0;
+
+        if (availableQuantity < request.getQuantity()) {
+             throw new RuntimeException("Product is out of stock or insufficient quantity! Available: " + availableQuantity);
         }
 
         // STEP 3: Get Cart or Create New
@@ -59,8 +74,8 @@ public class CartServiceImpl implements CartService {
             CartItem item = existingItem.get();
             int newQuantity = item.getQuantity() + request.getQuantity();
             // Re-validate stock for the new total quantity
-            if (inventory.getQuantity() < newQuantity) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getName() + ". Available: " + inventory.getQuantity());
+            if (availableQuantity < newQuantity) {
+                throw new RuntimeException("Insufficient stock for product: " + product.getName() + ". Available: " + availableQuantity);
             }
             item.setQuantity(newQuantity);
         } else {
@@ -119,9 +134,17 @@ public class CartServiceImpl implements CartService {
             cart.getItems().remove(item);
         } else {
             // Validate stock for the new quantity
-            InventoryResponse inventory = inventoryClient.getInventoryByProductId(productId);
-            if (inventory == null || inventory.getQuantity() < requestedQuantity) {
-                throw new RuntimeException("Insufficient stock for product: " + item.getProductName() + ". Available: " + (inventory != null ? inventory.getQuantity() : 0));
+            InventoryResponse inventory = null;
+            try {
+                inventory = inventoryClient.getInventoryByProductId(productId);
+            } catch (Exception e) {
+                // If inventory service returns 404 or fails, assume 0 stock
+            }
+
+            int availableQuantity = (inventory != null && inventory.getQuantity() != null) ? inventory.getQuantity() : 0;
+
+            if (availableQuantity < requestedQuantity) {
+                throw new RuntimeException("Insufficient stock for product: " + item.getProductName() + ". Available: " + availableQuantity);
             }
             item.setQuantity(requestedQuantity);
         }

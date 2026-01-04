@@ -6,3 +6,8 @@ spring:
   cloud:
     config:
       fail-fast: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://spring-security:8089

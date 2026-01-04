@@ -15,14 +15,20 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
 
     @Override
-    public InventoryResponse getInventoryByProductId(Long productId) {
+    public InventoryResponse getInventoryByProductId(Long productId, boolean isAdmin) {
         Inventory inventory = inventoryRepository.findByProductId(productId)
-                .orElse(Inventory.builder().productId(productId).quantity(0).build()); // Return 0 if no entry found
+                .orElse(Inventory.builder().productId(productId).quantity(0).build());
 
-        return InventoryResponse.builder()
+        InventoryResponse.InventoryResponseBuilder responseBuilder = InventoryResponse.builder()
                 .productId(inventory.getProductId())
-                .quantity(inventory.getQuantity())
-                .build();
+                .inStock(inventory.getQuantity() > 0);
+
+        // Only show exact quantity if the user is an ADMIN or it's an internal service call
+        if (isAdmin) {
+            responseBuilder.quantity(inventory.getQuantity());
+        }
+
+        return responseBuilder.build();
     }
 
     @Override

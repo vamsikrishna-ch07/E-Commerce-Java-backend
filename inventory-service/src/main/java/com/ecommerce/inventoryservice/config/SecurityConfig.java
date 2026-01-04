@@ -2,19 +2,12 @@ package com.ecommerce.inventoryservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.stream.Stream;
 
 @Configuration
 @EnableWebSecurity
@@ -31,46 +24,47 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 ))
-                .csrf(csrf -> csrf.disable()); // Disable CSRF for API endpoints
+                .csrf(csrf -> csrf.disable());
         return http.build();
     }
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // This converter will extract authorities from the "scope" or "scp" claim.
+        JwtGrantedAuthoritiesConverter scopeAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+
+        // This converter will extract authorities from our custom "authorities" claim.
+        JwtGrantedAuthoritiesConverter claimAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        claimAuthoritiesConverter.setAuthoritiesClaimName("authorities");
+        // We don't want the default "SCOPE_" prefix for our roles.
+        claimAuthoritiesConverter.setAuthorityPrefix("");
+
+        // Create a new converter that will merge the authorities from both sources.
+        // This ensures that both SCOPE_ and ROLE_ authorities are correctly processed.
+        var authoritiesConverter = new DelegatingJwtGrantedAuthoritiesConverter(
+                scopeAuthoritiesConverter,
+                claimAuthoritiesConverter
+        );
+
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new CustomJwtGrantedAuthoritiesConverter());
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
         return jwtAuthenticationConverter;
     }
 }
 
-class CustomJwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+// Helper class to delegate to multiple converters
+class DelegatingJwtGrantedAuthoritiesConverter implements org.springframework.core.convert.converter.Converter<org.springframework.security.oauth2.jwt.Jwt, java.util.Collection<org.springframework.security.core.GrantedAuthority>> {
+
+    private final java.util.List<org.springframework.core.convert.converter.Converter<org.springframework.security.oauth2.jwt.Jwt, java.util.Collection<org.springframework.security.core.GrantedAuthority>>> converters;
+
+    public DelegatingJwtGrantedAuthoritiesConverter(org.springframework.core.convert.converter.Converter<org.springframework.security.oauth2.jwt.Jwt, java.util.Collection<org.springframework.security.core.GrantedAuthority>>... converters) {
+        this.converters = java.util.Arrays.asList(converters);
+    }
+
     @Override
-    public Collection<GrantedAuthority> convert(Jwt jwt) {
-        Collection<GrantedAuthority> grantedAuthorities = new HashSet<>();
-
-        // Extract SCOPE_ authorities from the 'scope' claim
-        String scope = jwt.getClaimAsString("scope");
-        if (scope != null) {
-            Stream.of(scope.split(" "))
-                    .map(scopeName -> "SCOPE_" + scopeName)
-                    .map(SimpleGrantedAuthority::new)
-                    .forEach(grantedAuthorities::add);
-        }
-
-        // Extract ROLE_ authorities from the 'authorities' claim
-        Collection<String> authorities = jwt.getClaimAsStringList("authorities");
-        if (authorities != null) {
-            authorities.stream()
-                    .map(roleName -> {
-                        if (roleName.startsWith("ROLE_")) {
-                            return new SimpleGrantedAuthority(roleName);
-                        }
-                        // If roles don't start with ROLE_, add it for consistency with hasRole()
-                        return new SimpleGrantedAuthority("ROLE_" + roleName);
-                    })
-                    .forEach(grantedAuthorities::add);
-        }
-
-        return grantedAuthorities;
+    public java.util.Collection<org.springframework.security.core.GrantedAuthority> convert(org.springframework.security.oauth2.jwt.Jwt jwt) {
+        return this.converters.stream()
+                .flatMap(converter -> converter.convert(jwt).stream())
+                .collect(java.util.stream.Collectors.toSet());
     }
 }

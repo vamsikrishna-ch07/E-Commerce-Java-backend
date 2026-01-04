@@ -1,4 +1,4 @@
-package com.ecommerce.cartservice.config;
+package com.ecommerce.wishlistservice.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -25,11 +25,11 @@ public class FeignClientInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate template) {
         // We need to get the registration for the client we want to use.
-        // The name "cart-service-client" should match what's in your application.yml or centralized config.
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId("cart-service-client");
+        // The name "wishlist-service-client" should match what's in your application.yml or centralized config.
+        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId("wishlist-service-client");
 
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(clientRegistration.getRegistrationId())
-                .principal("cart-service") // The principal name can be anything for client_credentials
+                .principal("wishlist-service") // The principal name can be anything for client_credentials
                 .build();
 
         // Use the authorizedClientManager to get the token.

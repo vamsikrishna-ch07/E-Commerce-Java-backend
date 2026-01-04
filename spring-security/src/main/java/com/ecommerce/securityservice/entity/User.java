@@ -30,11 +30,12 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // This method now correctly and safely uses the 'role' field.
         if (this.role == null) {
             return Collections.emptyList();
         }
-        return Collections.singletonList(new SimpleGrantedAuthority(this.role));
+        // Ensure the role is prefixed with "ROLE_" for consistency with hasRole() checks
+        String authority = this.role.startsWith("ROLE_") ? this.role : "ROLE_" + this.role;
+        return Collections.singletonList(new SimpleGrantedAuthority(authority));
     }
 
     // Boilerplate UserDetails methods

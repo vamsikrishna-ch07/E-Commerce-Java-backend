@@ -128,10 +128,10 @@ public class SecurityConfig {
                 context.getClaims().claim("authorities", authorities);
 
                 // For user authentication (not client_credentials)
-                if (principal.getPrincipal() instanceof User) { // Check if it's our custom UserDetails
+                if (principal.getPrincipal() instanceof User) {
                     User user = (User) principal.getPrincipal();
-                    context.getClaims().subject(user.getId().toString()); // Set 'sub' to user ID
-                    context.getClaims().claim("username", user.getUsername()); // Add username as a custom claim
+                    context.getClaims().subject(user.getId().toString());
+                    context.getClaims().claim("username", user.getUsername());
                 } else if (principal instanceof OAuth2ClientAuthenticationToken) {
                     // Existing logic for client_credentials flow
                     OAuth2ClientAuthenticationToken clientPrincipal = (OAuth2ClientAuthenticationToken) principal;
