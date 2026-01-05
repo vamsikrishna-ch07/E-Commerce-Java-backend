@@ -1,13 +1,14 @@
 package com.ecommerce.inventoryservice;
 
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
+
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class InventoryServiceApplicationTests {
+public class InventoryServiceApplicationTests {
 
 	@Test
-	void contextLoads() {
+    public void contextLoads() {
 	}
 
 }

@@ -21,7 +21,6 @@ public class InventoryController {
     @GetMapping("/{productId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAnyAuthority('SCOPE_products.read', 'SCOPE_internal.read')")
     public ResponseEntity<InventoryResponse> getInventoryByProductId(@PathVariable("productId") Long productId, Authentication authentication) {
-        // This check remains to differentiate logic within the service if needed (e.g., returning more data for admins)
         boolean isAdminOrInternal = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(authority -> authority.equals("ROLE_ADMIN") || authority.equals("SCOPE_internal.read"));
@@ -47,14 +46,14 @@ public class InventoryController {
 
     @PutMapping("/{productId}/reduce")
     @PreAuthorize("hasAuthority('SCOPE_internal.write')")
-    public ResponseEntity<Void> reduceStock(@PathVariable Long productId, @RequestParam Integer quantity) {
+    public ResponseEntity<Void> reduceStock(@PathVariable("productId") Long productId, @RequestParam("quantity") Integer quantity) {
         inventoryService.reduceStock(productId, quantity);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{productId}/restore")
     @PreAuthorize("hasAuthority('SCOPE_internal.write')")
-    public ResponseEntity<Void> restoreStock(@PathVariable Long productId, @RequestParam Integer quantity) {
+    public ResponseEntity<Void> restoreStock(@PathVariable("productId") Long productId, @RequestParam("quantity") Integer quantity) {
         inventoryService.restoreStock(productId, quantity);
         return ResponseEntity.ok().build();
     }

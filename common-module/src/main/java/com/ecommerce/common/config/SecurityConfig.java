@@ -1,4 +1,4 @@
-package com.ecommerce.orderservice.config;
+package com.ecommerce.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,9 +41,6 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new CustomJwtGrantedAuthoritiesConverter());
         return jwtAuthenticationConverter;
     }
-
-    // The duplicate authorizedClientManager bean has been removed from this file.
-    // The application will now use the one defined in WebClientConfig.java.
 }
 
 class CustomJwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {

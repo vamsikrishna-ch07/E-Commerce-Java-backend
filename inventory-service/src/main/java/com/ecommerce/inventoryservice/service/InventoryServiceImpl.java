@@ -2,6 +2,8 @@ package com.ecommerce.inventoryservice.service;
 
 import com.ecommerce.inventoryservice.dto.InventoryResponse;
 import com.ecommerce.inventoryservice.dto.StockUpdateRequest;
+import com.ecommerce.inventoryservice.exception.InsufficientStockException;
+import com.ecommerce.inventoryservice.exception.InventoryNotFoundException;
 import com.ecommerce.inventoryservice.model.Inventory;
 import com.ecommerce.inventoryservice.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,11 +50,11 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional
     public void updateStock(StockUpdateRequest request) {
         Inventory inventory = inventoryRepository.findByProductId(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("Inventory not found for product: " + request.getProductId()));
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found for product: " + request.getProductId()));
 
         int newQuantity = inventory.getQuantity() + request.getQuantity();
         if (newQuantity < 0) {
-            throw new RuntimeException("Insufficient stock for product: " + request.getProductId());
+            throw new InsufficientStockException("Insufficient stock for product: " + request.getProductId());
         }
         inventory.setQuantity(newQuantity);
         inventoryRepository.save(inventory);
@@ -62,10 +64,10 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional
     public void reduceStock(Long productId, Integer quantity) {
         Inventory inventory = inventoryRepository.findByProductId(productId)
-                .orElseThrow(() -> new RuntimeException("Inventory not found for product: " + productId));
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found for product: " + productId));
 
         if (inventory.getQuantity() < quantity) {
-            throw new RuntimeException("Insufficient stock to reduce for product: " + productId);
+            throw new InsufficientStockException("Insufficient stock to reduce for product: " + productId);
         }
         inventory.setQuantity(inventory.getQuantity() - quantity);
         inventoryRepository.save(inventory);
@@ -75,7 +77,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional
     public void restoreStock(Long productId, Integer quantity) {
         Inventory inventory = inventoryRepository.findByProductId(productId)
-                .orElseThrow(() -> new RuntimeException("Inventory not found for product: " + productId));
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found for product: " + productId));
 
         inventory.setQuantity(inventory.getQuantity() + quantity);
         inventoryRepository.save(inventory);

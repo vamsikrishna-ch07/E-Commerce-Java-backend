@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface OrderService {
     OrderResponse checkout(Long userId, OrderRequest orderRequest);
+    void updateOrderStatus(Long orderId, OrderStatus newStatus);
     OrderResponse getOrderById(Long orderId);
     List<OrderResponse> getOrdersByUserId(Long userId);
     void cancelOrder(Long userId, Long orderId);

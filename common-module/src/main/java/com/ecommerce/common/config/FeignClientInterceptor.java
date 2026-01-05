@@ -1,4 +1,4 @@
-package com.ecommerce.wishlistservice.config;
+package com.ecommerce.common.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -25,15 +25,26 @@ public class FeignClientInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate template) {
         // We need to get the registration for the client we want to use.
-        // The name "wishlist-service-client" should match what's in your application.yml or centralized config.
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId("wishlist-service-client");
+        // The name "service-client" is a generic name we will use for all internal calls.
+        // Each service's application.yml should define a registration with this name,
+        // OR we can make this dynamic. For now, let's assume "service-client" is the standard.
+        // If a service has a specific client ID (like "cart-service-client"), we might need a way to look it up.
+        // A simple fallback is to try "service-client" if a specific one isn't found, or just enforce "service-client" everywhere.
+        
+        String registrationId = "service-client"; 
+        
+        // Check if a specific registration exists (optional enhancement, sticking to simple for now)
+        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId);
+        
+        if (clientRegistration == null) {
+             // Fallback or error handling. For this refactoring, we assume the config exists.
+             return; 
+        }
 
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(clientRegistration.getRegistrationId())
-                .principal("wishlist-service") // The principal name can be anything for client_credentials
+                .principal("internal-service") 
                 .build();
 
-        // Use the authorizedClientManager to get the token.
-        // This will handle fetching a new token or reusing an existing one.
         OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
 
         if (authorizedClient != null && authorizedClient.getAccessToken() != null) {

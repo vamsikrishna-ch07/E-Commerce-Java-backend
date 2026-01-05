@@ -51,7 +51,7 @@ public class CartController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CartResponse> updateCartItem(
             Principal principal,
-            @PathVariable Long productId,
+            @PathVariable("productId") Long productId,
             @RequestBody UpdateCartItemRequest request) {
         Long userId = getUserId(principal);
         CartResponse cart = cartService.updateCartItem(userId, productId, request);
@@ -60,7 +60,7 @@ public class CartController {
 
     @DeleteMapping("/remove/{productId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> removeCartItem(Principal principal, @PathVariable Long productId) {
+    public ResponseEntity<Void> removeCartItem(Principal principal, @PathVariable("productId") Long productId) {
         Long userId = getUserId(principal);
         cartService.removeCartItem(userId, productId);
         return ResponseEntity.noContent().build();

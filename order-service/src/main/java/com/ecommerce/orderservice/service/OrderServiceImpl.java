@@ -54,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponse checkout(Long userId, OrderRequest orderRequest) {
         // 1. Validate User
-        UserResponse user = userClient.getUserById(userId); // First declaration and assignment
+        UserResponse user = userClient.getUserById(userId);
 
         // 2. Get Cart Details
         CartResponse cart = cartClient.getCartByUserId(userId);
@@ -62,18 +62,18 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Cart is empty or not found for user: " + userId);
         }
 
-        // 3. Validate Stock for all items and reduce it
+        // 3. Reduce stock for all items
         for (CartItemResponse cartItem : cart.getItems()) {
             inventoryClient.reduceStock(cartItem.getProductId(), cartItem.getQuantity());
         }
 
-        // 4. Create Order
+        // 4. Create Order with PENDING status. Payment is NOT processed here.
         Order order = Order.builder()
                 .orderNumber(UUID.randomUUID().toString())
                 .userId(userId)
                 .totalPrice(BigDecimal.valueOf(cart.getTotalPrice()))
                 .orderDate(LocalDateTime.now())
-                .status(OrderStatus.PENDING) // Initial status
+                .status(OrderStatus.PENDING) // The order is pending until payment is confirmed
                 .shippingAddress(orderRequest.getShippingAddress())
                 .orderItems(cart.getItems().stream()
                         .map(cartItem -> OrderItem.builder()
@@ -87,35 +87,34 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // 5. Process Payment (assuming synchronous for now)
-        try {
-            PaymentRequest paymentRequest = PaymentRequest.builder()
-                    .orderId(savedOrder.getId())
-                    .amount(savedOrder.getTotalPrice())
-                    .paymentMethod("CREDIT_CARD") // Example payment method
-                    .build();
-            paymentClient.processPayment(paymentRequest);
-            savedOrder.setStatus(OrderStatus.PROCESSING); // Payment successful
-        } catch (Exception e) {
-            // If payment fails, restore stock and set order status to PAYMENT_FAILED
-            for (OrderItem orderItem : savedOrder.getOrderItems()) {
-                inventoryClient.restoreStock(orderItem.getProductId(), orderItem.getQuantity());
-            }
-            savedOrder.setStatus(OrderStatus.CANCELLED); // Or PAYMENT_FAILED if such status exists
-            orderRepository.save(savedOrder);
-            throw new RuntimeException("Payment failed for order: " + savedOrder.getOrderNumber() + ". " + e.getMessage());
-        }
-
-        // 6. Clear the user's cart
+        // 5. Clear the user's cart
         cartClient.clearCart(userId);
 
-        // 7. Send Order Confirmation Notification
-        // Reusing the 'user' variable declared at the beginning of the method
-        sendOrderNotification(savedOrder, user.getEmail(), "Order Confirmation",
-                String.format("<h1>Your Order #%s is Confirmed!</h1><p>Thank you for your purchase, %s.</p><p>Total: $%.2f</p>",
+        // 6. Send Order Confirmation Notification
+        sendOrderNotification(savedOrder, user.getEmail(), "Order Received",
+                String.format("<h1>Your Order #%s has been received.</h1><p>Thank you for your purchase, %s. Please proceed with the payment.</p><p>Total: $%.2f</p>",
                         savedOrder.getOrderNumber(), user.getUsername(), savedOrder.getTotalPrice()));
 
         return mapToOrderResponse(savedOrder);
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+
+        // Here you could add logic to check for valid status transitions
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+
+        // Optionally, send a notification about the status update
+        if (newStatus == OrderStatus.PROCESSING) {
+            UserResponse user = userClient.getUserById(order.getUserId());
+            sendOrderNotification(order, user.getEmail(), "Payment Confirmed",
+                    String.format("<h1>Payment for Order #%s is Confirmed!</h1><p>Thank you, %s. Your order is now being processed.</p>",
+                            order.getOrderNumber(), user.getUsername()));
+        }
     }
 
     @Override

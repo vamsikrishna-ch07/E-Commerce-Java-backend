@@ -80,14 +80,16 @@ public class UserController {
 
     @PutMapping("/me/addresses/{addressId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<AddressResponse> updateAddress(Principal principal, @PathVariable Long addressId, @RequestBody AddressRequest request) {
+    public ResponseEntity<AddressResponse> updateAddress(Principal principal, @PathVariable("addressId") Long addressId, @RequestBody AddressRequest request) {
         AddressResponse updatedAddress = userService.updateAddress(getUserId(principal), addressId, request);
         return ResponseEntity.ok(updatedAddress);
     }
 
+
+
     @DeleteMapping("/me/addresses/{addressId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> deleteAddress(Principal principal, @PathVariable Long addressId) {
+    public ResponseEntity<Void> deleteAddress(Principal principal, @PathVariable("addressId") Long addressId) {
         userService.deleteAddress(getUserId(principal), addressId);
         return ResponseEntity.noContent().build();
     }

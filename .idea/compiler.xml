@@ -7,35 +7,36 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="config-server" />
         <module name="cart-service" />
+        <module name="common-module" />
+        <module name="product-service" />
+        <module name="user-service" />
+        <module name="wishlist-service" />
+        <module name="notification-service" />
+        <module name="config-server" />
         <module name="inventory-service" />
         <module name="payment-service" />
         <module name="gateway-service" />
-        <module name="product-service" />
         <module name="spring-security" />
         <module name="order-service" />
-        <module name="user-service" />
-        <module name="wishlist-service" />
         <module name="service-registry" />
-        <module name="notification-service" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="cart-service" options="-parameters" />
+      <module name="cart-service" options="" />
       <module name="config-server" options="-parameters" />
       <module name="gateway-service" options="-parameters" />
-      <module name="inventory-service" options="-parameters" />
-      <module name="notification-service" options="-parameters" />
-      <module name="order-service" options="-parameters" />
-      <module name="payment-service" options="-parameters" />
-      <module name="product-service" options="-parameters" />
+      <module name="inventory-service" options="" />
+      <module name="notification-service" options="" />
+      <module name="order-service" options="" />
+      <module name="payment-service" options="" />
+      <module name="product-service" options="" />
       <module name="service-registry" options="-parameters" />
-      <module name="spring-security" options="-parameters" />
-      <module name="user-service" options="-parameters" />
-      <module name="wishlist-service" options="-parameters" />
+      <module name="spring-security" options="" />
+      <module name="user-service" options="" />
+      <module name="wishlist-service" options="" />
     </option>
   </component>
 </project>
