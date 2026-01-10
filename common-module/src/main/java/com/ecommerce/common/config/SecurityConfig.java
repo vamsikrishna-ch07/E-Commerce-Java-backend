@@ -26,6 +26,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/**").permitAll()
+                        // Allow registration endpoint publicly
+                        .requestMatchers("/api/v1/users/register").permitAll()
+                        // Allow public product viewing (if needed globally, or handle in specific services)
+                        .requestMatchers("/api/v1/products/**").permitAll() 
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt
