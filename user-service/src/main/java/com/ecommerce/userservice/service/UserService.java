@@ -7,6 +7,7 @@ import java.util.List;
 public interface UserService {
     // Authentication/Registration related
     UserResponse registerUser(UserRegistrationRequest request);
+    String login(LoginRequest request); // Added login method
     UserResponse getUserByUsername(String username); // Re-added for Spring Security
     UserResponse getUserById(Long userId); // Added for internal service calls
 
