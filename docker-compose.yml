@@ -57,29 +57,6 @@ services:
       timeout: 5s
       retries: 10
 
-  # Auth Service (Spring Security)
-  spring-security:
-    build: ./spring-security
-    container_name: spring-security
-    ports:
-      - "8089:8089"
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy # Wait for config-server to be healthy
-    environment:
-      - SERVER_PORT=8089
-    networks:
-      - ecommerce-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8089/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   # API Gateway
   gateway-service:
     build: ./gateway-service
@@ -87,8 +64,6 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      spring-security:
-        condition: service_healthy
       config-server:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
@@ -116,10 +91,9 @@ services:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
         condition: service_healthy
-      spring-security:
-        condition: service_healthy
     environment:
       - SERVER_PORT=8081
+
     networks:
       - ecommerce-network
     healthcheck:
@@ -140,10 +114,9 @@ services:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
         condition: service_healthy
-      spring-security:
-        condition: service_healthy
     environment:
       - SERVER_PORT=8082
+
     networks:
       - ecommerce-network
     healthcheck:
@@ -164,10 +137,9 @@ services:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
         condition: service_healthy
-      spring-security:
-        condition: service_healthy
     environment:
       - SERVER_PORT=8083
+
     networks:
       - ecommerce-network
     healthcheck:
@@ -188,10 +160,9 @@ services:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
         condition: service_healthy
-      spring-security:
-        condition: service_healthy
     environment:
       - SERVER_PORT=8084
+
     networks:
       - ecommerce-network
     healthcheck:
@@ -212,10 +183,9 @@ services:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
         condition: service_healthy
-      spring-security:
-        condition: service_healthy
     environment:
       - SERVER_PORT=8085
+
     networks:
       - ecommerce-network
     healthcheck:
@@ -236,10 +206,9 @@ services:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
         condition: service_healthy
-      spring-security:
-        condition: service_healthy
     environment:
       - SERVER_PORT=8086
+
     networks:
       - ecommerce-network
     healthcheck:
@@ -260,10 +229,9 @@ services:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
         condition: service_healthy
-      spring-security:
-        condition: service_healthy
     environment:
       - SERVER_PORT=8087
+
     networks:
       - ecommerce-network
     healthcheck:
@@ -283,8 +251,6 @@ services:
       config-server:
         condition: service_healthy # Wait for config-server to be healthy
       service-registry:
-        condition: service_healthy
-      spring-security:
         condition: service_healthy
     environment:
       - SERVER_PORT=8088

@@ -31,6 +31,13 @@ public class UserController {
         UserResponse newUser = userService.registerUser(request);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
+    
+    // PUBLIC ENDPOINT FOR LOGIN
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+        String token = userService.login(request);
+        return ResponseEntity.ok(token);
+    }
 
     // INTERNAL-ONLY ENDPOINT (for spring-security service)
     @GetMapping("/internal/{username}")

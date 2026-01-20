@@ -22,7 +22,7 @@
         <module>config-Server</module>
         <module>gateway-service</module>
         <module>service-registry</module>
-        <module>spring-security</module>
+        <!-- <module>spring-security</module> REMOVED -->
         <module>user-service</module>
         <module>product-service</module>
         <module>inventory-service</module>

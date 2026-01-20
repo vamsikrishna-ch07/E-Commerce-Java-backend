@@ -1,5 +1,6 @@
 package com.ecommerce.userservice.service;
 
+import com.ecommerce.common.util.JwtUtils;
 import com.ecommerce.userservice.client.NotificationClient;
 import com.ecommerce.userservice.dto.*;
 import com.ecommerce.userservice.model.Address;
@@ -8,10 +9,12 @@ import com.ecommerce.userservice.model.User;
 import com.ecommerce.userservice.repository.AddressRepository;
 import com.ecommerce.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +25,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final NotificationClient notificationClient;
-    private final PasswordEncoder passwordEncoder; // Inject the PasswordEncoder
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     // Helper to map User entity to UserResponse DTO
     private UserResponse mapToUserResponse(User user) {
@@ -87,6 +91,34 @@ public class UserServiceImpl implements UserService {
         }
 
         return mapToUserResponse(savedUser);
+    }
+
+    @Override
+    public String login(LoginRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid username or password");
+        }
+
+        // Create UserDetails object for token generation
+        // IMPORTANT: We use user.getId().toString() as the "username" for the token subject
+        // This ensures that other services can extract the User ID directly from the token.
+        
+        // Fix for Role: Ensure we don't double-prefix "ROLE_"
+        String roleName = user.getRole().name();
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+        
+        org.springframework.security.core.userdetails.User userDetails = new org.springframework.security.core.userdetails.User(
+                user.getId().toString(), 
+                user.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority(roleName))
+        );
+
+        return jwtUtils.generateToken(userDetails);
     }
 
     @Override
